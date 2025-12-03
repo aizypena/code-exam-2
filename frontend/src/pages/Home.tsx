@@ -1,13 +1,30 @@
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Home() {
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout, loading } = useAuth()
   const navigate = useNavigate()
+
+  // Redirect admin users to admin landing
+  useEffect(() => {
+    if (!loading && isAuthenticated && user?.role === 'Admin') {
+      navigate('/admin-landing', { replace: true })
+    }
+  }, [loading, isAuthenticated, user, navigate])
 
   const handleLogout = () => {
     logout()
     navigate('/')
+  }
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </main>
+    )
   }
 
   return (
